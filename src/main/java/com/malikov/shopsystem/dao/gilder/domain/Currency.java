@@ -1,4 +1,4 @@
-package com.malikov.shopsystem.gilder.domain;
+package com.malikov.shopsystem.dao.gilder.domain;
 
 import com.malikov.shopsystem.enumtype.CurrencyCode;
 import lombok.Getter;

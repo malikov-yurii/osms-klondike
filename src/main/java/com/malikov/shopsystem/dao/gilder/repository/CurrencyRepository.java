@@ -1,6 +1,6 @@
-package com.malikov.shopsystem.gilder.repository;
+package com.malikov.shopsystem.dao.gilder.repository;
 
-import com.malikov.shopsystem.gilder.domain.Currency;
+import com.malikov.shopsystem.dao.gilder.domain.Currency;
 import com.malikov.shopsystem.enumtype.CurrencyCode;
 import org.springframework.data.repository.CrudRepository;
 
