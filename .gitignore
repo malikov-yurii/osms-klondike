@@ -1,0 +1,16 @@
+target/
+git/nbproject
+.idea/
+*.iml
+node_modules
+log
+*.log
+package-lock.json
+build/
+.gradle/
+src/main/resources/application-db.yml
+bash.exe.stackdump
+ui/src/app/containers/products/products.component.js
+ui/src/app/directives/contenteditable-model.directive.js
+ui/src/app/services/orders.service.js
+ui/src/app/services/store-helper.service.js
