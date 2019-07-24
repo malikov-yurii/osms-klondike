@@ -28,7 +28,8 @@ compileJava {
 
 bootJar {
     baseName = 'osms-klondike'
-    version =  '0.1.0'
+    version =  '1'
+    launchScript()
 }
 
 dependencies {

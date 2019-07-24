@@ -52,7 +52,7 @@ public class GilderPersistenceConfiguration {
         return builder
                 .dataSource(dataSource)
                 .packages("com.malikov.shopsystem.dao.gilder")
-                .persistenceUnit("db1")
+                .persistenceUnit("gilder_db")
                 .build();
     }
 

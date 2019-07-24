@@ -50,7 +50,7 @@ public class KlondikePersistenceConfiguration {
         return builder
                 .dataSource(dataSource)
                 .packages("com.malikov.shopsystem.dao.klondike")
-                .persistenceUnit("db1")
+                .persistenceUnit("klondike_db")
                 .build();
     }
 
