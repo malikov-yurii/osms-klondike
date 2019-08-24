@@ -21,7 +21,8 @@ import static java.math.BigDecimal.ROUND_UP;
 @Slf4j
 public class UpdateKlondikeProductPricesService {
 
-    private static final int TWENTY_MINUTES = 20 * 60 * 1000;
+    private static final int MINUTE = 60 * 1000;
+    private static final int TWENTY_MINUTES = 20 * MINUTE;
 
     private final CurrencyRepository currencyRateRepository;
     private final ProductRepository productRepository;
@@ -35,7 +36,7 @@ public class UpdateKlondikeProductPricesService {
         this.productPriceInEuroRepository = productPriceInEuroRepository;
     }
 
-    @Scheduled(fixedDelay = TWENTY_MINUTES)
+    @Scheduled(fixedDelay = TWENTY_MINUTES, initialDelay = MINUTE)
     protected void productTest() {
         Optional.ofNullable(currencyRateRepository.findByCurrencyCode(CurrencyCode.EUR))
                 .map(Currency::getCurrencyRate)
@@ -56,10 +57,8 @@ public class UpdateKlondikeProductPricesService {
                         .ifPresent(product -> {
                             BigDecimal updatedPrice = productPriceInEuro.getPrice().divide(currencyRate, 0, ROUND_UP);
                             product.setPrice(updatedPrice);
-                            Product saved = productRepository.save(product);
-                            log.info(saved.getId() + " new product price is " + saved.getPrice());
+                            productRepository.save(product);
                         });
-
     }
 
 }
