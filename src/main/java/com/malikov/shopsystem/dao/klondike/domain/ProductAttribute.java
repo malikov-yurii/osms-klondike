@@ -5,9 +5,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,12 +15,16 @@ import java.math.BigInteger;
 @Table(name = "catalog_product_entity_decimal")
 @Getter
 @Setter
-public class Product {
+@IdClass(ProductAttributeId.class)
+public class ProductAttribute {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "entity_id", columnDefinition = "bigint(11)", unique = true, nullable = false)
-    private BigInteger id;
+    @Column(name = "entity_id", columnDefinition = "bigint(11)", nullable = false)
+    private BigInteger productId;
+
+    @Id
+    @Column(name = "attribute_id")
+    private Integer attributeId;
 
     @Column(name = "value")
     private BigDecimal price;

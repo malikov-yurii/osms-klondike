@@ -23,7 +23,7 @@ public class UpdateCurrencyExchangeRateService {
 
     private static final String AUCTION_EXCHANGE_RATE_URL =
             "http://api.minfin.com.ua/auction/info/58ec1c89d7ea9221853cf7b777a02c686c455a03/";
-    private static final int TWENTY_MINUTES = 20 * 60 * 1000;
+    private static final int FOUR_HOURS = 4 * 60 * 60 * 1000;
 
     private final CurrencyRepository currencyRateRepository;
     private final RestTemplate restTemplate;
@@ -34,11 +34,10 @@ public class UpdateCurrencyExchangeRateService {
         this.restTemplate = restTemplate;
     }
 
-    @Scheduled(fixedDelay = TWENTY_MINUTES)
+    @Scheduled(fixedDelay = FOUR_HOURS)
     @Transactional
     protected void refreshEuroExchangeRate() {
         try {
-            log.info("Scheduled exchange rate update attempt.");
             Currency euro = Optional.ofNullable(currencyRateRepository.findByCurrencyCode(CurrencyCode.EUR))
                     .orElseThrow(NotSupportedCurrencyException::new);
 

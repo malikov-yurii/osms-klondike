@@ -2,10 +2,7 @@ package com.malikov.shopsystem.service;
 
 import com.malikov.shopsystem.dao.gilder.domain.Currency;
 import com.malikov.shopsystem.dao.gilder.repository.CurrencyRepository;
-import com.malikov.shopsystem.dao.klondike.domain.Product;
-import com.malikov.shopsystem.dao.klondike.domain.ProductPriceInEuro;
-import com.malikov.shopsystem.dao.klondike.repository.ProductPriceInEuroRepository;
-import com.malikov.shopsystem.dao.klondike.repository.ProductRepository;
+import com.malikov.shopsystem.dao.klondike.repository.ProductAttributeValueRepository;
 import com.malikov.shopsystem.enumtype.CurrencyCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,21 +20,20 @@ public class UpdateKlondikeProductPricesService {
 
     private static final int MINUTE = 60 * 1000;
     private static final int TWENTY_MINUTES = 20 * MINUTE;
+    private static final Integer PRICE_IN_EURO_ID = 233;
+    private static final Integer PRICE_IN_HRN = 77;
 
     private final CurrencyRepository currencyRateRepository;
-    private final ProductRepository productRepository;
-    private final ProductPriceInEuroRepository productPriceInEuroRepository;
+    private final ProductAttributeValueRepository productAttributeRepository;
 
     public UpdateKlondikeProductPricesService(CurrencyRepository currencyRateRepository,
-                                              ProductRepository productRepository,
-                                              ProductPriceInEuroRepository productPriceInEuroRepository) {
+                                              ProductAttributeValueRepository productAttributeRepository) {
         this.currencyRateRepository = currencyRateRepository;
-        this.productRepository = productRepository;
-        this.productPriceInEuroRepository = productPriceInEuroRepository;
+        this.productAttributeRepository = productAttributeRepository;
     }
 
     @Scheduled(fixedDelay = TWENTY_MINUTES, initialDelay = MINUTE)
-    protected void productTest() {
+    protected void scheduledUpdateProductPriceByCurrency() {
         Optional.ofNullable(currencyRateRepository.findByCurrencyCode(CurrencyCode.EUR))
                 .map(Currency::getCurrencyRate)
                 .ifPresent(updateWithNewCurrencyRateKlondikeProductsWithPriceInEuro());
@@ -45,20 +41,19 @@ public class UpdateKlondikeProductPricesService {
 
     private Consumer<BigDecimal> updateWithNewCurrencyRateKlondikeProductsWithPriceInEuro() {
         return currencyRate -> {
-            log.info("New currency rate for products with prices in euro = " + currencyRate);
-            productPriceInEuroRepository.findAll()
-                    .forEach(updateProductPrice(currencyRate));
+            productAttributeRepository.findAllByAttributeId(PRICE_IN_EURO_ID)
+                    .stream()
+                    .filter(productPriceInEuro ->
+                            BigDecimal.ZERO.compareTo(productPriceInEuro.getPrice()) != 0)
+                    .forEach(productPriceInEuro ->
+                            productAttributeRepository.findByProductIdAndAttributeId(productPriceInEuro.getProductId(), PRICE_IN_HRN)
+                                    .ifPresent(productPriceInHrn -> {
+                                        BigDecimal updatedPrice = productPriceInEuro.getPrice().divide(currencyRate, 0, ROUND_UP);
+                                        productPriceInHrn.setPrice(updatedPrice);
+                                        productAttributeRepository.save(productPriceInHrn);
+                                    })
+                    );
         };
-    }
-
-    private Consumer<ProductPriceInEuro> updateProductPrice(BigDecimal currencyRate) {
-        return productPriceInEuro ->
-                productRepository.findById(productPriceInEuro.getProductId())
-                        .ifPresent(product -> {
-                            BigDecimal updatedPrice = productPriceInEuro.getPrice().divide(currencyRate, 0, ROUND_UP);
-                            product.setPrice(updatedPrice);
-                            productRepository.save(product);
-                        });
     }
 
 }
